@@ -1,10 +1,14 @@
 {
   "name": "sap-fiori-freestyle-learning-project",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
-  "description": "Commented SAPUI5 freestyle learning application consuming the companion CAP OData V4 service.",
+  "description": "Commented SAP Fiori and SAPUI5 learning application covering freestyle UI5, OData V4, tests, Launchpad concepts, Fiori elements, and BTP deployment.",
   "scripts": {
     "start": "ui5 serve --open index.html",
+    "start:flp": "ui5 serve --open test/flpSandbox.html",
+    "test:unit": "ui5 serve --open test/unit/unitTests.qunit.html",
+    "test:integration": "ui5 serve --open test/integration/opaTests.qunit.html",
+    "test": "npm run lint && npm run build",
     "build": "ui5 build --all --clean-dest",
     "lint": "ui5 lint"
   },
