@@ -5,12 +5,14 @@
   xmlns:core="sap.ui.core">
 
   <Page
+    id="productListPage"
     title="{i18n>productListTitle}"
     busy="{view>/busy}"
     busyIndicatorDelay="0">
 
     <headerContent>
       <Button
+        id="createProductButton"
         icon="sap-icon://add"
         text="{i18n>createProduct}"
         type="Emphasized"
@@ -19,22 +21,26 @@
 
     <content>
       <VBox class="sapUiSmallMargin">
-        <OverflowToolbar>
+        <OverflowToolbar id="productToolbar">
           <SearchField
+            id="productSearchField"
             width="100%"
+            value="{view>/searchText}"
             liveChange=".onSearch"
             search=".onSearch"
             placeholder="{i18n>searchProducts}" />
           <ToolbarSpacer />
           <Button
-            icon="sap-icon://sort-ascending"
-            tooltip="{i18n>sortByName}"
-            press=".onSortByName" />
+            id="productSettingsButton"
+            icon="sap-icon://action-settings"
+            tooltip="{i18n>productSettings}"
+            press=".onOpenProductSettings" />
         </OverflowToolbar>
 
         <!--
           Aggregation binding fills table items from /Products.
           growing=true limits initial rendering and requests more data as needed.
+          Stable IDs make tests, support, and UI5 flexibility more reliable.
         -->
         <Table
           id="productTable"
@@ -77,7 +83,9 @@
                 <ObjectNumber
                   number="{price}"
                   unit="IDR" />
-                <ObjectNumber number="{stock}" />
+                <ObjectNumber
+                  number="{stock}"
+                  state="{= ${stock} &lt; 10 ? 'Warning' : 'None' }" />
                 <ObjectStatus
                   text="{= ${active} ? ${i18n>active} : ${i18n>inactive} }"
                   state="{= ${active} ? 'Success' : 'Error' }" />
