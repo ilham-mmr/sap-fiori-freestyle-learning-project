@@ -1,8 +1,9 @@
 sap.ui.define([
   "sap/ui/core/UIComponent",
   "sap/ui/Device",
-  "sap/ui/model/json/JSONModel"
-], function (UIComponent, Device, JSONModel) {
+  "sap/ui/model/json/JSONModel",
+  "sap/ui/core/Messaging"
+], function (UIComponent, Device, JSONModel, Messaging) {
   "use strict";
 
   return UIComponent.extend("sap.fiori.learning.Component", {
@@ -19,16 +20,18 @@ sap.ui.define([
       // belong in the backend, such as device information or shell flags.
       this.setModel(new JSONModel(Device), "device");
 
-      // MessageManager collects validation and OData messages centrally.
-      // Registering the component makes messages available to child controls.
-      sap.ui.getCore().getMessageManager().registerObject(this, true);
+      // Messaging collects validation and OData messages centrally. Exposing
+      // the message model allows a future MessagePopover to bind directly to
+      // {/} on the named "message" model.
+      Messaging.registerObject(this, true);
+      this.setModel(Messaging.getMessageModel(), "message");
 
       // Routing starts only after models and shared state are ready.
       this.getRouter().initialize();
     },
 
     destroy: function () {
-      sap.ui.getCore().getMessageManager().unregisterObject(this);
+      Messaging.unregisterObject(this);
       UIComponent.prototype.destroy.apply(this, arguments);
     }
   });
