@@ -1,0 +1,10 @@
+/* Keep custom CSS small. Prefer standard SAPUI5 spacing and layout classes. */
+.sapFioriLearningPage {
+  max-width: 96rem;
+  margin: 0 auto;
+}
+
+/* Prevent very long descriptions from making compact table rows unreadable. */
+.sapFioriLearningDescription {
+  max-width: 32rem;
+}
