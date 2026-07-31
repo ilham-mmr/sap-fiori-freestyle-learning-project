@@ -5,6 +5,7 @@
   xmlns:f="sap.ui.layout.form">
 
   <Page
+    id="productDetailPage"
     title="{i18n>productDetailTitle}"
     showNavButton="true"
     navButtonPress=".onNavBack"
@@ -13,20 +14,24 @@
 
     <headerContent>
       <Button
+        id="editProductButton"
         text="{i18n>edit}"
         icon="sap-icon://edit"
         visible="{= !${view>/editMode} }"
         press=".onEdit" />
       <Button
+        id="saveProductButton"
         text="{i18n>save}"
         type="Emphasized"
         visible="{view>/editMode}"
         press=".onSave" />
       <Button
+        id="cancelProductButton"
         text="{i18n>cancel}"
         visible="{view>/editMode}"
         press=".onCancel" />
       <Button
+        id="deleteProductButton"
         text="{i18n>delete}"
         type="Reject"
         visible="{= !${view>/editMode} }"
@@ -35,6 +40,7 @@
 
     <content>
       <f:SimpleForm
+        id="productForm"
         class="sapUiResponsiveMargin"
         editable="{view>/editMode}"
         layout="ResponsiveGridLayout"
@@ -48,40 +54,45 @@
         columnsL="1"
         columnsM="1">
 
-        <Label text="{i18n>name}" />
+        <Label text="{i18n>name}" labelFor="productNameInput" />
         <Input
+          id="productNameInput"
           value="{path: 'name', parameters: {$$updateGroupId: 'changes'}}"
           editable="{view>/editMode}"
           required="true" />
 
-        <Label text="{i18n>description}" />
+        <Label text="{i18n>description}" labelFor="productDescriptionInput" />
         <TextArea
+          id="productDescriptionInput"
           value="{path: 'description', parameters: {$$updateGroupId: 'changes'}}"
           editable="{view>/editMode}"
           rows="3" />
 
-        <Label text="{i18n>price}" />
+        <Label text="{i18n>price}" labelFor="productPriceInput" />
         <Input
+          id="productPriceInput"
           value="{path: 'price', type: 'sap.ui.model.odata.type.Decimal', parameters: {$$updateGroupId: 'changes'}}"
           editable="{view>/editMode}"
           type="Number" />
 
-        <Label text="{i18n>stock}" />
+        <Label text="{i18n>stock}" labelFor="productStockInput" />
         <Input
+          id="productStockInput"
           value="{path: 'stock', type: 'sap.ui.model.odata.type.Int32', parameters: {$$updateGroupId: 'changes'}}"
           editable="{view>/editMode}"
           type="Number" />
 
-        <Label text="{i18n>active}" />
+        <Label text="{i18n>active}" labelFor="productActiveSwitch" />
         <Switch
+          id="productActiveSwitch"
           state="{path: 'active', parameters: {$$updateGroupId: 'changes'}}"
           enabled="{view>/editMode}" />
 
-        <Label text="{i18n>createdAt}" />
-        <Text text="{createdAt}" />
+        <Label text="{i18n>createdAt}" labelFor="productCreatedAtText" />
+        <Text id="productCreatedAtText" text="{createdAt}" />
 
-        <Label text="{i18n>modifiedAt}" />
-        <Text text="{modifiedAt}" />
+        <Label text="{i18n>modifiedAt}" labelFor="productModifiedAtText" />
+        <Text id="productModifiedAtText" text="{modifiedAt}" />
       </f:SimpleForm>
     </content>
   </Page>
