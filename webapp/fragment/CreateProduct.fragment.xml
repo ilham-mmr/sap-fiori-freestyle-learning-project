@@ -1,0 +1,53 @@
+<core:FragmentDefinition
+  xmlns="sap.m"
+  xmlns:core="sap.ui.core"
+  xmlns:f="sap.ui.layout.form">
+
+  <!--
+    A fragment has no controller of its own. Event handlers are delegated to
+    the controller that loaded it, keeping the dialog reusable and lightweight.
+  -->
+  <Dialog
+    id="createProductDialog"
+    title="{i18n>createProduct}"
+    contentWidth="32rem"
+    draggable="true"
+    resizable="true"
+    busy="{view>/busy}">
+
+    <content>
+      <f:SimpleForm
+        class="sapUiSmallMargin"
+        editable="true"
+        layout="ResponsiveGridLayout">
+
+        <Label text="{i18n>name}" required="true" />
+        <Input value="{view>/create/name}" />
+
+        <Label text="{i18n>description}" />
+        <TextArea value="{view>/create/description}" rows="3" />
+
+        <Label text="{i18n>price}" required="true" />
+        <Input value="{view>/create/price}" type="Number" />
+
+        <Label text="{i18n>stock}" />
+        <Input value="{view>/create/stock}" type="Number" />
+
+        <Label text="{i18n>active}" />
+        <Switch state="{view>/create/active}" />
+      </f:SimpleForm>
+    </content>
+
+    <beginButton>
+      <Button
+        text="{i18n>create}"
+        type="Emphasized"
+        press=".onCreateProduct" />
+    </beginButton>
+    <endButton>
+      <Button
+        text="{i18n>cancel}"
+        press=".onCancelCreate" />
+    </endButton>
+  </Dialog>
+</core:FragmentDefinition>
