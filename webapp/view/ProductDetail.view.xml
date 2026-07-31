@@ -1,0 +1,88 @@
+<mvc:View
+  controllerName="sap.fiori.learning.controller.ProductDetail"
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m"
+  xmlns:f="sap.ui.layout.form">
+
+  <Page
+    title="{i18n>productDetailTitle}"
+    showNavButton="true"
+    navButtonPress=".onNavBack"
+    busy="{view>/busy}"
+    busyIndicatorDelay="0">
+
+    <headerContent>
+      <Button
+        text="{i18n>edit}"
+        icon="sap-icon://edit"
+        visible="{= !${view>/editMode} }"
+        press=".onEdit" />
+      <Button
+        text="{i18n>save}"
+        type="Emphasized"
+        visible="{view>/editMode}"
+        press=".onSave" />
+      <Button
+        text="{i18n>cancel}"
+        visible="{view>/editMode}"
+        press=".onCancel" />
+      <Button
+        text="{i18n>delete}"
+        type="Reject"
+        visible="{= !${view>/editMode} }"
+        press=".onDelete" />
+    </headerContent>
+
+    <content>
+      <f:SimpleForm
+        class="sapUiResponsiveMargin"
+        editable="{view>/editMode}"
+        layout="ResponsiveGridLayout"
+        labelSpanXL="3"
+        labelSpanL="3"
+        labelSpanM="4"
+        emptySpanXL="4"
+        emptySpanL="4"
+        emptySpanM="0"
+        columnsXL="1"
+        columnsL="1"
+        columnsM="1">
+
+        <Label text="{i18n>name}" />
+        <Input
+          value="{path: 'name', parameters: {$$updateGroupId: 'changes'}}"
+          editable="{view>/editMode}"
+          required="true" />
+
+        <Label text="{i18n>description}" />
+        <TextArea
+          value="{path: 'description', parameters: {$$updateGroupId: 'changes'}}"
+          editable="{view>/editMode}"
+          rows="3" />
+
+        <Label text="{i18n>price}" />
+        <Input
+          value="{path: 'price', type: 'sap.ui.model.odata.type.Decimal', parameters: {$$updateGroupId: 'changes'}}"
+          editable="{view>/editMode}"
+          type="Number" />
+
+        <Label text="{i18n>stock}" />
+        <Input
+          value="{path: 'stock', type: 'sap.ui.model.odata.type.Int32', parameters: {$$updateGroupId: 'changes'}}"
+          editable="{view>/editMode}"
+          type="Number" />
+
+        <Label text="{i18n>active}" />
+        <Switch
+          state="{path: 'active', parameters: {$$updateGroupId: 'changes'}}"
+          enabled="{view>/editMode}" />
+
+        <Label text="{i18n>createdAt}" />
+        <Text text="{createdAt}" />
+
+        <Label text="{i18n>modifiedAt}" />
+        <Text text="{modifiedAt}" />
+      </f:SimpleForm>
+    </content>
+  </Page>
+</mvc:View>
