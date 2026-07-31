@@ -1,0 +1,7 @@
+<mvc:View
+  controllerName="sap.fiori.learning.controller.App"
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m">
+  <!-- The root App control is the routing target container configured in manifest.json. -->
+  <App id="app" />
+</mvc:View>
