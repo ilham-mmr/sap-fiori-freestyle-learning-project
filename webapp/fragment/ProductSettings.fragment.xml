@@ -1,0 +1,47 @@
+<core:FragmentDefinition
+  xmlns="sap.m"
+  xmlns:core="sap.ui.core">
+
+  <!--
+    ViewSettingsDialog is the standard Fiori pattern for compact table
+    sort/filter settings. Keys are technical values interpreted by the hosting
+    controller; visible texts come from i18n.
+  -->
+  <ViewSettingsDialog
+    id="productSettingsDialog"
+    title="{i18n>productSettings}"
+    confirm=".onConfirmProductSettings">
+
+    <sortItems>
+      <ViewSettingsItem
+        key="name"
+        text="{i18n>name}"
+        selected="true" />
+      <ViewSettingsItem
+        key="price"
+        text="{i18n>price}" />
+      <ViewSettingsItem
+        key="stock"
+        text="{i18n>stock}" />
+    </sortItems>
+
+    <filterItems>
+      <ViewSettingsFilterItem
+        key="productStatus"
+        text="{i18n>status}"
+        multiSelect="true">
+        <items>
+          <ViewSettingsItem
+            key="active"
+            text="{i18n>active}" />
+          <ViewSettingsItem
+            key="inactive"
+            text="{i18n>inactive}" />
+          <ViewSettingsItem
+            key="lowStock"
+            text="{i18n>lowStock}" />
+        </items>
+      </ViewSettingsFilterItem>
+    </filterItems>
+  </ViewSettingsDialog>
+</core:FragmentDefinition>
