@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>SAP Fiori Launchpad Sandbox - Product Administration</title>
+
+  <script src="flpSandboxConfig.js"></script>
+  <script src="../test-resources/sap/ushell/bootstrap/sandbox.js"></script>
+
+  <script
+    id="sap-ui-bootstrap"
+    src="../resources/sap-ui-core.js"
+    data-sap-ui-theme="sap_horizon"
+    data-sap-ui-async="true"
+    data-sap-ui-compat-version="edge"
+    data-sap-ui-libs="sap.m,sap.ushell,sap.ui.fl"
+    data-sap-ui-resourceroots='{"sap.fiori.learning":"../"}'>
+  </script>
+
+  <script>
+    sap.ui.getCore().attachInit(function () {
+      sap.ushell.Container.createRenderer().placeAt("content");
+
+      // Launch the configured intent directly when no hash was supplied.
+      if (!window.location.hash) {
+        window.location.hash = "#Product-display";
+      }
+    });
+  </script>
+</head>
+<body class="sapUiBody" id="content"></body>
+</html>
