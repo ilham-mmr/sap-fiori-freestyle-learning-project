@@ -5,7 +5,8 @@ sap.ui.define([
   "sap/ui/model/FilterOperator",
   "sap/ui/model/Sorter",
   "sap/ui/core/Fragment",
-  "sap/m/MessageToast"
+  "sap/m/MessageToast",
+  "../util/Validator"
 ], function (
   BaseController,
   JSONModel,
@@ -13,7 +14,8 @@ sap.ui.define([
   FilterOperator,
   Sorter,
   Fragment,
-  MessageToast
+  MessageToast,
+  Validator
 ) {
   "use strict";
 
@@ -31,29 +33,102 @@ sap.ui.define([
           active: true
         }
       }), "view");
+
+      // Keep the search and settings state separate, then combine them in one
+      // place. This avoids one toolbar action accidentally deleting another
+      // action's filters.
+      this._sSearchQuery = "";
+      this._aSettingsFilters = [];
+      this._oSorter = new Sorter("name", false);
     },
 
     onSearch: function (oEvent) {
-      const sQuery = oEvent.getParameter("query") || oEvent.getParameter("newValue") || "";
-      const oBinding = this.byId("productTable").getBinding("items");
-
-      // With an OData V4 list binding, UI5 translates supported filters to
-      // server-side $filter. This avoids downloading every record first.
-      const aFilters = sQuery ? [
-        new Filter({
-          filters: [
-            new Filter("name", FilterOperator.Contains, sQuery),
-            new Filter("description", FilterOperator.Contains, sQuery)
-          ],
-          and: false
-        })
-      ] : [];
-
-      oBinding.filter(aFilters);
+      this._sSearchQuery = oEvent.getParameter("query") ||
+        oEvent.getParameter("newValue") || "";
+      this.getModel("view").setProperty("/searchText", this._sSearchQuery);
+      this._applyListSettings();
     },
 
     onSortByName: function () {
-      this.byId("productTable").getBinding("items").sort(new Sorter("name", false));
+      // Kept as a small direct-sort example. The ViewSettingsDialog below is
+      // the more complete Fiori pattern for combined sort/filter settings.
+      this._oSorter = new Sorter("name", false);
+      this._applyListSettings();
+    },
+
+    onOpenProductSettings: async function () {
+      if (!this._pProductSettingsDialog) {
+        this._pProductSettingsDialog = Fragment.load({
+          id: this.getView().getId(),
+          name: "sap.fiori.learning.fragment.ProductSettings",
+          controller: this
+        }).then((oDialog) => {
+          this.getView().addDependent(oDialog);
+          return oDialog;
+        });
+      }
+
+      const oDialog = await this._pProductSettingsDialog;
+      oDialog.open();
+    },
+
+    onConfirmProductSettings: function (oEvent) {
+      const oParameters = oEvent.getParameters();
+      const sSortKey = oParameters.sortItem?.getKey() || "name";
+
+      this._oSorter = new Sorter(sSortKey, Boolean(oParameters.sortDescending));
+      this._aSettingsFilters = (oParameters.filterItems || [])
+        .map((oItem) => this._createSettingsFilter(oItem.getKey()))
+        .filter(Boolean);
+
+      this._applyListSettings();
+    },
+
+    _createSettingsFilter: function (sKey) {
+      switch (sKey) {
+        case "active":
+          return new Filter("active", FilterOperator.EQ, true);
+        case "inactive":
+          return new Filter("active", FilterOperator.EQ, false);
+        case "lowStock":
+          return new Filter("stock", FilterOperator.LT, 10);
+        default:
+          return null;
+      }
+    },
+
+    _applyListSettings: function () {
+      const oBinding = this.byId("productTable").getBinding("items");
+      const aAndGroups = [];
+
+      if (this._sSearchQuery) {
+        // The inner group is OR: name contains query OR description contains
+        // query. UI5 translates supported OData V4 filters into $filter.
+        aAndGroups.push(new Filter({
+          filters: [
+            new Filter("name", FilterOperator.Contains, this._sSearchQuery),
+            new Filter("description", FilterOperator.Contains, this._sSearchQuery)
+          ],
+          and: false
+        }));
+      }
+
+      if (this._aSettingsFilters.length > 0) {
+        // Selected status options are alternatives, therefore OR.
+        aAndGroups.push(new Filter({
+          filters: this._aSettingsFilters,
+          and: false
+        }));
+      }
+
+      // The search group and status group must both match, therefore AND.
+      const aFinalFilters = aAndGroups.length > 0 ? [new Filter({
+        filters: aAndGroups,
+        and: true
+      })] : [];
+
+      oBinding.filter(aFinalFilters);
+      oBinding.sort(this._oSorter);
     },
 
     onItemPress: function (oEvent) {
@@ -92,10 +167,11 @@ sap.ui.define([
     onCreateProduct: async function () {
       const oViewModel = this.getModel("view");
       const oPayload = { ...oViewModel.getProperty("/create") };
+      const oValidation = Validator.validateProduct(oPayload);
       const oListBinding = this.byId("productTable").getBinding("items");
 
-      if (!String(oPayload.name || "").trim()) {
-        this.showError(null, "Product name is required.");
+      if (!oValidation.valid) {
+        this.showError(null, oValidation.errors.join("\n"));
         return;
       }
 
@@ -109,9 +185,9 @@ sap.ui.define([
         const oDialog = await this._pCreateDialog;
         oDialog.close();
         this._resetCreateForm();
-        MessageToast.show("Product created");
+        MessageToast.show(this.getResourceBundle().getText("productCreated"));
       } catch (oError) {
-        this.showError(oError, "Could not create the product.");
+        this.showError(oError, this.getResourceBundle().getText("createProductError"));
       } finally {
         oViewModel.setProperty("/busy", false);
       }
@@ -128,9 +204,10 @@ sap.ui.define([
     },
 
     onExit: function () {
-      // Dependents are destroyed with the view, but clearing our reference
+      // Dependents are destroyed with the view, but clearing our references
       // prevents accidental reuse after controller destruction.
       this._pCreateDialog = null;
+      this._pProductSettingsDialog = null;
     }
   });
 });
