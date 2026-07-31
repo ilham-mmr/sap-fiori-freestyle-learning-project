@@ -1,0 +1,36 @@
+name: UI5 Quality Checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Lint UI5 project
+        run: npm run lint
+
+      - name: Build production bundle
+        run: npm run build
+
+      # QUnit and OPA5 runners are included in webapp/test. They are browser
+      # tests and are intentionally practised interactively in this learning
+      # repository. A production project should add a supported headless test
+      # runner appropriate to its current SAPUI5/tooling version.
