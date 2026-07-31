@@ -1,0 +1,25 @@
+<mvc:View
+  controllerName="sap.fiori.learning.controller.NotFound"
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m">
+
+  <Page
+    title="{i18n>notFoundTitle}"
+    showNavButton="true"
+    navButtonPress=".onNavHome">
+    <content>
+      <IllustratedMessage
+        illustrationType="sapIllus-PageNotFound"
+        title="{i18n>notFoundTitle}"
+        description="{i18n>notFoundDescription}">
+        <additionalContent>
+          <Button
+            id="notFoundHomeButton"
+            type="Emphasized"
+            text="{i18n>backToProducts}"
+            press=".onNavHome" />
+        </additionalContent>
+      </IllustratedMessage>
+    </content>
+  </Page>
+</mvc:View>
