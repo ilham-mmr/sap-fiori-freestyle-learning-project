@@ -12,6 +12,9 @@ framework:
     - name: sap.f
     - name: sap.ui.core
     - name: sap.ui.layout
+    - name: sap.ui.test
+    - name: sap.ui.fl
+    - name: sap.ushell
     - name: themelib_sap_horizon
 
 server:
