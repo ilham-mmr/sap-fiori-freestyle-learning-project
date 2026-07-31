@@ -1,8 +1,7 @@
 <mvc:View
   controllerName="sap.fiori.learning.controller.ProductList"
   xmlns:mvc="sap.ui.core.mvc"
-  xmlns="sap.m"
-  xmlns:core="sap.ui.core">
+  xmlns="sap.m">
 
   <Page
     id="productListPage"
