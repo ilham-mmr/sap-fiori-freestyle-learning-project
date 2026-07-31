@@ -1,0 +1,25 @@
+specVersion: "3.0"
+metadata:
+  name: sap.fiori.learning
+
+type: application
+
+framework:
+  name: SAPUI5
+  version: "1.136.0"
+  libraries:
+    - name: sap.m
+    - name: sap.f
+    - name: sap.ui.core
+    - name: sap.ui.layout
+    - name: themelib_sap_horizon
+
+server:
+  customMiddleware:
+    # Proxy only the backend path. UI5 framework resources are served by UI5 Tooling.
+    - name: ui5-middleware-simpleproxy
+      afterMiddleware: compression
+      mountPath: /odata
+      configuration:
+        baseUri: http://localhost:4004/odata
+        strictSSL: false
