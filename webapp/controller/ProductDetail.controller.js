@@ -2,8 +2,9 @@ sap.ui.define([
   "./BaseController",
   "sap/ui/model/json/JSONModel",
   "sap/m/MessageBox",
-  "sap/m/MessageToast"
-], function (BaseController, JSONModel, MessageBox, MessageToast) {
+  "sap/m/MessageToast",
+  "../util/Validator"
+], function (BaseController, JSONModel, MessageBox, MessageToast, Validator) {
   "use strict";
 
   return BaseController.extend("sap.fiori.learning.controller.ProductDetail", {
@@ -22,6 +23,7 @@ sap.ui.define([
 
     _onProductMatched: function (oEvent) {
       const sProductID = decodeURIComponent(oEvent.getParameter("arguments").productId);
+      this.getModel("view").setProperty("/editMode", false);
 
       // A canonical OData V4 entity path uses the key predicate. UUID values
       // are supported directly by the CAP OData service.
@@ -35,7 +37,10 @@ sap.ui.define([
           dataReceived: (oDataEvent) => {
             this.getModel("view").setProperty("/busy", false);
             if (oDataEvent.getParameter("error")) {
-              this.showError(oDataEvent.getParameter("error"), "Product could not be loaded.");
+              this.showError(
+                oDataEvent.getParameter("error"),
+                this.getResourceBundle().getText("productLoadError")
+              );
             }
           }
         }
@@ -62,11 +67,22 @@ sap.ui.define([
     onSave: async function () {
       const oViewModel = this.getModel("view");
       const oModel = this.getModel();
+      const oContext = this.getView().getBindingContext();
+      const oValidation = Validator.validateProduct(oContext?.getObject());
+
+      if (!oValidation.valid) {
+        this.showError(null, oValidation.errors.join("\n"));
+        return;
+      }
 
       oViewModel.setProperty("/busy", true);
       try {
         // Inputs use $$updateGroupId='changes'. submitBatch sends all pending
         // changes in that group together, reducing HTTP round trips.
+        //
+        // The CAP service exposes an ETag. UI5 sends If-Match automatically;
+        // a stale version can therefore be rejected instead of overwriting a
+        // newer update from another user.
         await oModel.submitBatch("changes");
 
         if (oModel.hasPendingChanges("changes")) {
@@ -74,16 +90,16 @@ sap.ui.define([
         }
 
         oViewModel.setProperty("/editMode", false);
-        MessageToast.show("Product saved");
+        MessageToast.show(this.getResourceBundle().getText("productSaved"));
       } catch (oError) {
-        this.showError(oError, "Could not save the product.");
+        this.showError(oError, this.getResourceBundle().getText("saveProductError"));
       } finally {
         oViewModel.setProperty("/busy", false);
       }
     },
 
     onDelete: function () {
-      MessageBox.confirm("Delete this product? This action cannot be undone.", {
+      MessageBox.confirm(this.getResourceBundle().getText("deleteProductConfirm"), {
         emphasizedAction: MessageBox.Action.DELETE,
         actions: [MessageBox.Action.DELETE, MessageBox.Action.CANCEL],
         onClose: async (sAction) => {
@@ -95,10 +111,10 @@ sap.ui.define([
 
           try {
             await oContext.delete();
-            MessageToast.show("Product deleted");
+            MessageToast.show(this.getResourceBundle().getText("productDeleted"));
             this.getRouter().navTo("productList", {}, true);
           } catch (oError) {
-            this.showError(oError, "Could not delete the product.");
+            this.showError(oError, this.getResourceBundle().getText("deleteProductError"));
           } finally {
             oViewModel.setProperty("/busy", false);
           }
