@@ -1,0 +1,117 @@
+_schema-version: "3.3"
+ID: sap-fiori-freestyle-learning-project
+version: 1.0.0
+
+parameters:
+  enable-parallel-deployments: true
+
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm ci
+        - npm run build
+
+modules:
+  # Packages the built UI5 application as HTML5 repository content.
+  - name: sap-fiori-freestyle-learning-project-content
+    type: com.sap.application.content
+    path: .
+    requires:
+      - name: sap-fiori-freestyle-learning-project-html5-host
+        parameters:
+          content-target: true
+    build-parameters:
+      build-result: dist
+      requires:
+        - name: sap-fiori-freestyle-learning-project-ui
+          artifacts:
+            - sapfiorilearning.zip
+          target-path: resources/
+
+  - name: sap-fiori-freestyle-learning-project-ui
+    type: html5
+    path: .
+    build-parameters:
+      builder: custom
+      commands:
+        - npm ci
+        - npm run build
+        - cd dist && zip -r ../sapfiorilearning.zip .
+      supported-platforms: []
+      build-result: dist
+
+  # Creates destination content used by Work Zone / HTML5 runtime.
+  - name: sap-fiori-freestyle-learning-project-destination-content
+    type: com.sap.application.content
+    requires:
+      - name: sap-fiori-freestyle-learning-project-destination
+        parameters:
+          content-target: true
+      - name: sap-fiori-freestyle-learning-project-html5-host
+        parameters:
+          service-key:
+            name: html5-repo-key
+      - name: sap-fiori-freestyle-learning-project-auth
+        parameters:
+          service-key:
+            name: xsuaa-key
+    parameters:
+      content:
+        instance:
+          destinations:
+            - Name: sap-fiori-freestyle-learning-project-html5
+              ServiceInstanceName: sap-fiori-freestyle-learning-project-html5-host
+              ServiceKeyName: html5-repo-key
+              sap.cloud.service: sap.fiori.learning
+            - Name: sap-fiori-freestyle-learning-project-auth
+              Authentication: OAuth2UserTokenExchange
+              ServiceInstanceName: sap-fiori-freestyle-learning-project-auth
+              ServiceKeyName: xsuaa-key
+              sap.cloud.service: sap.fiori.learning
+          existing_destinations_policy: update
+
+resources:
+  - name: sap-fiori-freestyle-learning-project-html5-host
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-plan: app-host
+
+  - name: sap-fiori-freestyle-learning-project-destination
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: destination
+      service-plan: lite
+      config:
+        HTML5Runtime_enabled: true
+        init_data:
+          instance:
+            existing_destinations_policy: update
+            destinations:
+              # Replace URL with the deployed CAP service route or maintain
+              # this destination separately in each environment.
+              - Name: cap-learning-api
+                Type: HTTP
+                ProxyType: Internet
+                URL: https://REPLACE-WITH-CAP-ROUTE.example.com
+                Authentication: NoAuthentication
+                HTML5.DynamicDestination: true
+                HTML5.ForwardAuthToken: true
+
+  - name: sap-fiori-freestyle-learning-project-auth
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: application
+      config:
+        xsappname: sap-fiori-freestyle-learning-project-${space}
+        tenant-mode: dedicated
+        role-templates:
+          - name: Viewer
+            description: Access the learning UI application
+            scope-references:
+              - $XSAPPNAME.Viewer
+        scopes:
+          - name: $XSAPPNAME.Viewer
+            description: Access the learning UI application
