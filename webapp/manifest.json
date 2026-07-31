@@ -1,0 +1,110 @@
+{
+  "_version": "1.65.0",
+  "sap.app": {
+    "id": "sap.fiori.learning",
+    "type": "application",
+    "i18n": "i18n/i18n.properties",
+    "applicationVersion": {
+      "version": "1.0.0"
+    },
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "dataSources": {
+      "learningService": {
+        "uri": "/odata/v4/learning/",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "4.0"
+        }
+      }
+    }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "rootView": {
+      "viewName": "sap.fiori.learning.view.App",
+      "type": "XML",
+      "async": true,
+      "id": "app"
+    },
+    "dependencies": {
+      "minUI5Version": "1.120.0",
+      "libs": {
+        "sap.m": {},
+        "sap.f": {},
+        "sap.ui.core": {},
+        "sap.ui.layout": {}
+      }
+    },
+    "contentDensities": {
+      "compact": true,
+      "cozy": true
+    },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "sap.fiori.learning.i18n.i18n"
+        }
+      },
+      "": {
+        "dataSource": "learningService",
+        "preload": true,
+        "settings": {
+          "operationMode": "Server",
+          "synchronizationMode": "None",
+          "autoExpandSelect": true,
+          "earlyRequests": true,
+          "groupId": "$auto",
+          "updateGroupId": "changes"
+        }
+      }
+    },
+    "resources": {
+      "css": [
+        {
+          "uri": "css/style.css"
+        }
+      ]
+    },
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "viewType": "XML",
+        "viewPath": "sap.fiori.learning.view",
+        "controlId": "app",
+        "controlAggregation": "pages",
+        "async": true
+      },
+      "routes": [
+        {
+          "pattern": "",
+          "name": "productList",
+          "target": "productList"
+        },
+        {
+          "pattern": "products/{productId}",
+          "name": "productDetail",
+          "target": "productDetail"
+        }
+      ],
+      "targets": {
+        "productList": {
+          "viewId": "productList",
+          "viewName": "ProductList"
+        },
+        "productDetail": {
+          "viewId": "productDetail",
+          "viewName": "ProductDetail"
+        }
+      }
+    }
+  }
+}
