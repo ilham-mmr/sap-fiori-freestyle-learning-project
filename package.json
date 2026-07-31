@@ -1,0 +1,23 @@
+{
+  "name": "sap-fiori-freestyle-learning-project",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Commented SAPUI5 freestyle learning application consuming the companion CAP OData V4 service.",
+  "scripts": {
+    "start": "ui5 serve --open index.html",
+    "build": "ui5 build --all --clean-dest",
+    "lint": "ui5 lint"
+  },
+  "devDependencies": {
+    "@sap-ux/ui5-middleware-fe-mockserver": "latest",
+    "@ui5/cli": "latest",
+    "@ui5/linter": "latest",
+    "ui5-middleware-simpleproxy": "latest"
+  },
+  "ui5": {
+    "dependencies": [
+      "@sap-ux/ui5-middleware-fe-mockserver",
+      "ui5-middleware-simpleproxy"
+    ]
+  }
+}
